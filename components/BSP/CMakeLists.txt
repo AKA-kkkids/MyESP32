@@ -6,6 +6,7 @@ set(src_dirs
             LEDC
             IIC
             XL9555
+            USART
             )
 
 set(include_dirs
@@ -16,6 +17,7 @@ set(include_dirs
             LEDC
             IIC
             XL9555
+            USART
             )
 
 set(requires
