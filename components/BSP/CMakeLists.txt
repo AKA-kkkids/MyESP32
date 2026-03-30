@@ -7,6 +7,7 @@ set(src_dirs
             IIC
             XL9555
             USART
+            24CXX
             )
 
 set(include_dirs
@@ -18,6 +19,7 @@ set(include_dirs
             IIC
             XL9555
             USART
+            24CXX
             )
 
 set(requires
