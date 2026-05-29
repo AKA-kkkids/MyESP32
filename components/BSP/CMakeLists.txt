@@ -8,6 +8,8 @@ set(src_dirs
             XL9555
             USART
             24CXX
+            LCD
+            SPI
             )
 
 set(include_dirs
@@ -20,6 +22,8 @@ set(include_dirs
             XL9555
             USART
             24CXX
+            LCD
+            SPI
             )
 
 set(requires
