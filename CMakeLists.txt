@@ -3,9 +3,7 @@
 # The following five lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.16)
-
-set(EXCLUDE_COMPONENTS_DIRS components/Middlewares)
 add_compile_options(-fdiagnostics-color=always)
-
+set(EXTRA_COMPONENT_DIRS middle_ware)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(MyESP32)

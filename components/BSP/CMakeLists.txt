@@ -10,6 +10,7 @@ set(src_dirs
             24CXX
             LCD
             SPI
+            SHELL
             )
 
 set(include_dirs
@@ -24,10 +25,11 @@ set(include_dirs
             24CXX
             LCD
             SPI
+            SHELL
             )
 
 set(requires
-            driver log)
+            driver log letter-shell)
 
 idf_component_register(
     SRC_DIRS ${src_dirs} INCLUDE_DIRS ${include_dirs} REQUIRES ${requires})

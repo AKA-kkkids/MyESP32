@@ -12,23 +12,32 @@
 #include "24cxx.h"
 #include "lcd.h"
 #include "esp_system.h"
+#include "bsp_shell.h"
+#include "esp_log.h"
 
+static const char *TAG = "main";
 //#define MY_PWM
 //#define MY_KEY
 //#define MY_XL9555
 //#define MY_USART
 //#define MY_EEPROM
-
 #define MY_LCD
+
+int system_reboot(void) 
+{
+    esp_restart(); 
+    return 0;
+}
+MAIN_SHELL_EXPORT_CMD(system_reboot, "reboot", "reboot the esp32");
 
 #ifdef MY_LCD
 
 i2c_obj_t i2c0_master;
 
 /**
- * @brief       ³ÌĞòÈë¿Ú
- * @param       ÎŞ
- * @retval      ÎŞ
+ * @brief       ç¨‹åºå…¥å£
+ * @param       æ— 
+ * @retval      æ— 
  */
 void app_main(void)
 {
@@ -36,7 +45,7 @@ void app_main(void)
     esp_err_t ret;
     
     
-    ret = nvs_flash_init();             /* ³õÊ¼»¯NVS */
+    ret = nvs_flash_init();             /* åˆå§‹åŒ–NVS */
 
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
@@ -44,12 +53,12 @@ void app_main(void)
         ret = nvs_flash_init();
     }
 
-    led_init();                         /* ³õÊ¼»¯LED */
-    i2c0_master = iic_init(I2C_NUM_0);  /* ³õÊ¼»¯IIC0 */
-    spi2_init();                        /* ³õÊ¼»¯SPI2 */
-    xl9555_init(i2c0_master);           /* IOÀ©Õ¹Ğ¾Æ¬³õÊ¼»¯ */
-    lcd_init();                         /* ³õÊ¼»¯LCD */
-
+    led_init();                         /* åˆå§‹åŒ–LED */
+    i2c0_master = iic_init(I2C_NUM_0);  /* åˆå§‹åŒ–IIC0 */
+    spi2_init();                        /* åˆå§‹åŒ–SPI2 */
+    xl9555_init(i2c0_master);           /* IOæ‰©å±•èŠ¯ç‰‡åˆå§‹åŒ– */
+    lcd_init();                         /* åˆå§‹åŒ–LCD */
+    bsp_shell_init();                    /* åˆå§‹åŒ–shell */
     while (1)
     {
         switch (x)
@@ -129,6 +138,7 @@ void app_main(void)
 
         LED_TOGGLE();
         vTaskDelay(500);
+        ESP_LOGI(TAG,"SYSTEM RUNNING");
     }
 }
 #endif
@@ -136,8 +146,8 @@ void app_main(void)
 #ifdef MY_EEPROM
 i2c_obj_t i2c0_master;
 
-const uint8_t g_text_buf[] = {"ESP32-S3 EEPROM"};   /* ÒªĞ´Èëµ½24c02µÄ×Ö·û´®Êı×é */
-#define TEXT_SIZE   sizeof(g_text_buf)              /* TEXT×Ö·û´®³¤¶È */
+const uint8_t g_text_buf[] = {"ESP32-S3 EEPROM"};   /* è¦å†™å…¥åˆ°24c02çš„å­—ç¬¦ä¸²æ•°ç»„ */
+#define TEXT_SIZE   sizeof(g_text_buf)              /* TEXTå­—ç¬¦ä¸²é•¿åº¦ */
 void app_main(void)
 {
     uint16_t i = 0;
@@ -146,7 +156,7 @@ void app_main(void)
     uint8_t datatemp[TEXT_SIZE];
     esp_err_t ret;
     
-    ret = nvs_flash_init();             /* ³õÊ¼»¯NVS */
+    ret = nvs_flash_init();             /* åˆå§‹åŒ–NVS */
 
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
@@ -155,18 +165,18 @@ void app_main(void)
     }
     led_init();
     i2c0_master = iic_init(I2C_NUM_0);
-    xl9555_init(i2c0_master);           /* IOÀ©Õ¹Ğ¾Æ¬³õÊ¼»¯ */
-    at24cxx_init(i2c0_master);          /* ³õÊ¼»¯24CXX */
+    xl9555_init(i2c0_master);           /* IOæ‰©å±•èŠ¯ç‰‡åˆå§‹åŒ– */
+    at24cxx_init(i2c0_master);          /* åˆå§‹åŒ–24CXX */
 
-    err = at24cxx_check();              /* ¼ì²âAT24C02 */
+    err = at24cxx_check();              /* æ£€æµ‹AT24C02 */
     
     if (err != 0)
     {
-        while (1)                       /* ¼ì²â²»µ½24c02 */
+        while (1)                       /* æ£€æµ‹ä¸åˆ°24c02 */
         {
             printf("24C02 check failed, please check!\n");
             vTaskDelay(500);
-            LED_TOGGLE();               /* LEDÉÁË¸ */
+            LED_TOGGLE();               /* LEDé—ªçƒ */
         }
     }
     printf("24C02 Ready!\n");
@@ -200,7 +210,7 @@ void app_main(void)
 
         if (i == 20)
         {
-            LED_TOGGLE();               /* LEDÉÁË¸ */
+            LED_TOGGLE();               /* LEDé—ªçƒ */
             i = 0;
         }
         
@@ -220,7 +230,7 @@ void app_main(void)
     uint16_t times = 0;
     unsigned char data[RX_BUF_SIZE] = {0};
 
-    ret = nvs_flash_init();                                                             /* ³õÊ¼»¯NVS */
+    ret = nvs_flash_init();                                                             /* åˆå§‹åŒ–NVS */
 
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
@@ -228,19 +238,19 @@ void app_main(void)
         ret = nvs_flash_init();
     }
     
-    led_init();                                                                         /* ³õÊ¼»¯LED */
-    usart_init(115200);                                                                 /* ³õÊ¼»¯´®¿Ú */
+    led_init();                                                                         /* åˆå§‹åŒ–LED */
+    usart_init(115200);                                                                 /* åˆå§‹åŒ–ä¸²å£ */
 
     while(1)
     {
-        uart_get_buffered_data_len(USART_UX, (size_t*) &len);                           /* »ñÈ¡»·ĞÎ»º³åÇøÊı¾İ³¤¶È */
+        uart_get_buffered_data_len(USART_UX, (size_t*) &len);                           /* è·å–ç¯å½¢ç¼“å†²åŒºæ•°æ®é•¿åº¦ */
 
-        if (len > 0)                                                                    /* ÅĞ¶ÏÊı¾İ³¤¶È */
+        if (len > 0)                                                                    /* åˆ¤æ–­æ•°æ®é•¿åº¦ */
         {
-            memset(data, 0, RX_BUF_SIZE);                                               /* ¶Ô»º³åÇøÇåÁã */
-            printf("\nÄú·¢ËÍµÄÏûÏ¢Îª:\n");
-            uart_read_bytes(USART_UX, data, len, 100);                                  /* ¶ÁÊı¾İ */
-            uart_write_bytes(USART_UX, (const char*)data, strlen((const char*)data));   /* Ğ´Êı¾İ */
+            memset(data, 0, RX_BUF_SIZE);                                               /* å¯¹ç¼“å†²åŒºæ¸…é›¶ */
+            printf("\næ‚¨å‘é€çš„æ¶ˆæ¯ä¸º:\n");
+            uart_read_bytes(USART_UX, data, len, 100);                                  /* è¯»æ•°æ® */
+            uart_write_bytes(USART_UX, (const char*)data, strlen((const char*)data));   /* å†™æ•°æ® */
         }
         else
         {
@@ -248,13 +258,13 @@ void app_main(void)
 
             if (times % 5000 == 0)
             {
-                printf("\nÕıµãÔ­×Ó ATK-DNESP32-S3 ¿ª·¢°å ´®¿ÚÊµÑé\n");
-                printf("ÕıµãÔ­×Ó@ALIENTEK\n\n\n");
+                printf("\næ­£ç‚¹åŸå­ ATK-DNESP32-S3 å¼€å‘æ¿ ä¸²å£å®éªŒ\n");
+                printf("æ­£ç‚¹åŸå­@ALIENTEK\n\n\n");
             }
 
             if (times % 200 == 0)
             {
-                printf("ÇëÊäÈëÊı¾İ£¬ÒÔ»Ø³µ¼ü½áÊø\n");
+                printf("è¯·è¾“å…¥æ•°æ®ï¼Œä»¥å›è½¦é”®ç»“æŸ\n");
             }
 
             if (times % 30 == 0)
@@ -272,18 +282,18 @@ void app_main(void)
 #ifdef MY_PWM
 void app_main(void) 
 {
-    uint8_t dir = 1; //Õ¼¿Õ±È·½Ïò£ºµİÔö»¹ÊÇµİ¼õ
-    uint16_t ledcpwmval = 0; //Õ¼¿Õ±ÈÖµ ·¶Î§£º0-100
+    uint8_t dir = 1; //å ç©ºæ¯”æ–¹å‘ï¼šé€’å¢è¿˜æ˜¯é€’å‡
+    uint16_t ledcpwmval = 0; //å ç©ºæ¯”å€¼ èŒƒå›´ï¼š0-100
 
     ledc_config_t *ledc_config = malloc(sizeof(ledc_config_t));
 
-    ledc_config->clk_cfg = LEDC_AUTO_CLK; //¸ù¾İÉèÖÃ·Ö±æÂÊ¡¢Õ¼¿Õ±È£¬×Ô¶¯Ñ¡ÔñLEDCµÄÊ±ÖÓÔ´
+    ledc_config->clk_cfg = LEDC_AUTO_CLK; //æ ¹æ®è®¾ç½®åˆ†è¾¨ç‡ã€å ç©ºæ¯”ï¼Œè‡ªåŠ¨é€‰æ‹©LEDCçš„æ—¶é’Ÿæº
     ledc_config->timer_num = LEDC_PWM_TIMER;
-    ledc_config->freq_hz = 1000; //ÉèÖÃPWMÆµÂÊ
-    ledc_config->duty_resolution = LEDC_TIMER_14_BIT; //ÉèÖÃÕ¼¿Õ±È·Ö±æÂÊ
+    ledc_config->freq_hz = 1000; //è®¾ç½®PWMé¢‘ç‡
+    ledc_config->duty_resolution = LEDC_TIMER_14_BIT; //è®¾ç½®å ç©ºæ¯”åˆ†è¾¨ç‡
     ledc_config->channel = LEDC_PWM_CH0_CHANNEL;
     ledc_config->gpio_num = LEDC_PWM_CH0_GPIO;
-    ledc_config->duty = 0; //ÉèÖÃ³õÊ¼Õ¼¿Õ±È
+    ledc_config->duty = 0; //è®¾ç½®åˆå§‹å ç©ºæ¯”
     ledc_init(ledc_config);
 
     while(1)
@@ -350,7 +360,7 @@ void app_main(void)
     uint8_t key;
     esp_err_t ret;
 
-    ret = nvs_flash_init();             /* ³õÊ¼»¯NVS */
+    ret = nvs_flash_init();             /* åˆå§‹åŒ–NVS */
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
         ESP_ERROR_CHECK(nvs_flash_erase());

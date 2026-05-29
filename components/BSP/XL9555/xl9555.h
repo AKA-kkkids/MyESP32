@@ -8,63 +8,63 @@
 #include "freertos/task.h"
 #include "iic.h"
 
-/* Òı½ÅÓëÏà¹Ø²ÎÊı¶¨Òå */
-#define XL9555_INT_IO                   GPIO_NUM_40 /* XL9555_INT Òı½Å */
-#define XL9555_INT                      gpio_get_level(XL9555_INT_IO) /* ¶ÁÈ¡ XL9555_INT µÄµçÆ½ */
-#define XL9555_ADDR                     0x20 /* 7 Î»Æ÷¼şµØÖ· */
+/* å¼•è„šä¸ç›¸å…³å‚æ•°å®šä¹‰ */
+#define XL9555_INT_IO                   GPIO_NUM_40 /* XL9555_INT å¼•è„š */
+#define XL9555_INT                      gpio_get_level(XL9555_INT_IO) /* è¯»å– XL9555_INT çš„ç”µå¹³ */
+#define XL9555_ADDR                     0x20 /* 7 ä½å™¨ä»¶åœ°å€ */
 
-/* Æ÷¼ş¼Ä´æÆ÷ */
-#define XL9555_INPUT_PORT0_REG          0 /* ÊäÈë P0 ¼Ä´æÆ÷ÓÃÓÚ¶ÁÈ¡ P0 ¶Ë¿ÚµÄÊäÈëÖµ */
-#define XL9555_INPUT_PORT1_REG          1 /* ÊäÈë P1 ¼Ä´æÆ÷ÓÃÓÚ¶ÁÈ¡ P1 ¶Ë¿ÚµÄÊäÈëÖµ */
-#define XL9555_OUTPUT_PORT0_REG         2 /* Êä³ö P0 ¼Ä´æÆ÷ÓÃÓÚÉèÖÃ P0 ¶Ë¿ÚµÄÊä³öÖµ */
-#define XL9555_OUTPUT_PORT1_REG         3 /* Êä³ö P1 ¼Ä´æÆ÷ÓÃÓÚÉèÖÃ P1 ¶Ë¿ÚµÄÊä³öÖµ */
+/* å™¨ä»¶å¯„å­˜å™¨ */
+#define XL9555_INPUT_PORT0_REG          0 /* è¾“å…¥ P0 å¯„å­˜å™¨ç”¨äºè¯»å– P0 ç«¯å£çš„è¾“å…¥å€¼ */
+#define XL9555_INPUT_PORT1_REG          1 /* è¾“å…¥ P1 å¯„å­˜å™¨ç”¨äºè¯»å– P1 ç«¯å£çš„è¾“å…¥å€¼ */
+#define XL9555_OUTPUT_PORT0_REG         2 /* è¾“å‡º P0 å¯„å­˜å™¨ç”¨äºè®¾ç½® P0 ç«¯å£çš„è¾“å‡ºå€¼ */
+#define XL9555_OUTPUT_PORT1_REG         3 /* è¾“å‡º P1 å¯„å­˜å™¨ç”¨äºè®¾ç½® P1 ç«¯å£çš„è¾“å‡ºå€¼ */
 
 #define XL9555_INVERSION_PORT0_REG      4
-/* ¼«ĞÔ·´×ª P0 ¼Ä´æÆ÷ÓÃÓÚµ± P0 ¶Ë¿Ú×öÎªÊäÈëÊ±£¬¶ÔÊäÈëµÄµçÆ½½øĞĞ·´×ª´¦Àí£¬¼´¹Ü½ÅÎª¸ßµçÆ½Ê±£¬ÉèÖÃÕâ
-¸ö¼Ä´æÆ÷ÖĞÏàÓ¦µÄÎ»Îª 1 Ê±£¬¶ÁÈ¡µ½µÄÊäÈë¼Ä´æÆ÷0£¬1 µÄÖµ¾ÍÊÇµÍµçÆ½0 */
+/* ææ€§åè½¬ P0 å¯„å­˜å™¨ç”¨äºå½“ P0 ç«¯å£åšä¸ºè¾“å…¥æ—¶ï¼Œå¯¹è¾“å…¥çš„ç”µå¹³è¿›è¡Œåè½¬å¤„ç†ï¼Œå³ç®¡è„šä¸ºé«˜ç”µå¹³æ—¶ï¼Œè®¾ç½®è¿™
+ä¸ªå¯„å­˜å™¨ä¸­ç›¸åº”çš„ä½ä¸º 1 æ—¶ï¼Œè¯»å–åˆ°çš„è¾“å…¥å¯„å­˜å™¨0ï¼Œ1 çš„å€¼å°±æ˜¯ä½ç”µå¹³0 */
 #define XL9555_INVERSION_PORT1_REG      5 
-/* ¼«ĞÔ·´×ª P1 ¼Ä´æÆ÷ÓÃÓÚµ± P1 ¶Ë¿Ú×öÎªÊäÈëÊ±£¬¶ÔÊäÈëµÄµçÆ½½øĞĞ·´×ª´¦Àí£¬¼´¹Ü½ÅÎª¸ßµçÆ½Ê±£¬ÉèÖÃÕâ
-¸ö¼Ä´æÆ÷ÖĞÏàÓ¦µÄÎ»Îª 1 Ê±£¬¶ÁÈ¡µ½µÄÊäÈë¼Ä´æÆ÷0£¬1 µÄÖµ¾ÍÊÇµÍµçÆ½0 */
+/* ææ€§åè½¬ P1 å¯„å­˜å™¨ç”¨äºå½“ P1 ç«¯å£åšä¸ºè¾“å…¥æ—¶ï¼Œå¯¹è¾“å…¥çš„ç”µå¹³è¿›è¡Œåè½¬å¤„ç†ï¼Œå³ç®¡è„šä¸ºé«˜ç”µå¹³æ—¶ï¼Œè®¾ç½®è¿™
+ä¸ªå¯„å­˜å™¨ä¸­ç›¸åº”çš„ä½ä¸º 1 æ—¶ï¼Œè¯»å–åˆ°çš„è¾“å…¥å¯„å­˜å™¨0ï¼Œ1 çš„å€¼å°±æ˜¯ä½ç”µå¹³0 */
 
 #define XL9555_CONFIG_PORT0_REG         6 
-/* ÅäÖÃ P0 ¼Ä´æÆ÷ÓÃÓÚÅäÖÃ P0 ¶Ë¿ÚµÄ×öÎªÊäÈë(1)»òÊÇÊä³ö(0) */
+/* é…ç½® P0 å¯„å­˜å™¨ç”¨äºé…ç½® P0 ç«¯å£çš„åšä¸ºè¾“å…¥(1)æˆ–æ˜¯è¾“å‡º(0) */
 #define XL9555_CONFIG_PORT1_REG         7 
-/* ÅäÖÃ P1 ¼Ä´æÆ÷ÓÃÓÚÅäÖÃ P1 ¶Ë¿ÚµÄ×öÎªÊäÈë(1)»òÊÇÊä³ö(0) */
+/* é…ç½® P1 å¯„å­˜å™¨ç”¨äºé…ç½® P1 ç«¯å£çš„åšä¸ºè¾“å…¥(1)æˆ–æ˜¯è¾“å‡º(0) */
 
-/* XL9555 ¸÷¸ö IO µÄ¹¦ÄÜ */
-#define AP_INT_IO                      0x0001 /* AP3216C ÖĞ¶ÏÒı½Å P00 */
-#define QMA_INT_IO                     0x0002 /* QMA6100P ÖĞ¶ÏÒı½Å P01 */
-#define SPK_EN_IO                      0x0004 /* ¹¦·ÅÊ¹ÄÜÒı½Å P02 */
-#define BEEP_IO                        0x0008 /* ·äÃùÆ÷¿ØÖÆÒı½Å P03 */
-#define OV_PWDN_IO                     0x0010 /* ÉãÏñÍ·´ı»úÒı½Å P04 */
-#define OV_RESET_IO                    0x0020 /* ÉãÏñÍ·¸´Î»Òı½Å P05 */
-#define GBC_LED_IO                     0x0040 /* ATK_MODULE ½Ó¿Ú LED Òı½Å P06 */
-#define GBC_KEY_IO                     0x0080 /* ATK_MODULE ½Ó¿Ú KEY Òı½Å P07 */
-#define LCD_BL_IO                      0x0100 /* RGB ÆÁ±³¹â¿ØÖÆÒı½Å P10 */
-#define CT_RST_IO                      0x0200 /* ´¥ÃşÆÁÖĞ¶ÏÒı½Å P11 */
-#define SLCD_RST_IO                    0x0400 /* SPI_LCD ¸´Î»Òı½Å P12 */
-#define SLCD_PWR_IO                    0x0800 /* SPI_LCD ¿ØÖÆ±³¹âÒı½Å P13 */
+/* XL9555 å„ä¸ª IO çš„åŠŸèƒ½ */
+#define AP_INT_IO                      0x0001 /* AP3216C ä¸­æ–­å¼•è„š P00 */
+#define QMA_INT_IO                     0x0002 /* QMA6100P ä¸­æ–­å¼•è„š P01 */
+#define SPK_EN_IO                      0x0004 /* åŠŸæ”¾ä½¿èƒ½å¼•è„š P02 */
+#define BEEP_IO                        0x0008 /* èœ‚é¸£å™¨æ§åˆ¶å¼•è„š P03 */
+#define OV_PWDN_IO                     0x0010 /* æ‘„åƒå¤´å¾…æœºå¼•è„š P04 */
+#define OV_RESET_IO                    0x0020 /* æ‘„åƒå¤´å¤ä½å¼•è„š P05 */
+#define GBC_LED_IO                     0x0040 /* ATK_MODULE æ¥å£ LED å¼•è„š P06 */
+#define GBC_KEY_IO                     0x0080 /* ATK_MODULE æ¥å£ KEY å¼•è„š P07 */
+#define LCD_BL_IO                      0x0100 /* RGB å±èƒŒå…‰æ§åˆ¶å¼•è„š P10 */
+#define CT_RST_IO                      0x0200 /* è§¦æ‘¸å±ä¸­æ–­å¼•è„š P11 */
+#define SLCD_RST_IO                    0x0400 /* SPI_LCD å¤ä½å¼•è„š P12 */
+#define SLCD_PWR_IO                    0x0800 /* SPI_LCD æ§åˆ¶èƒŒå…‰å¼•è„š P13 */
 
-#define KEY3_IO                        0x1000 /* °´¼ü 3 Òı½Å P14 */
-#define KEY2_IO                        0x2000 /* °´¼ü 2 Òı½Å P15 */
-#define KEY1_IO                        0x4000 /* °´¼ü 1 Òı½Å P16 */
-#define KEY0_IO                        0x8000 /* °´¼ü 0 Òı½Å P17 */
+#define KEY3_IO                        0x1000 /* æŒ‰é”® 3 å¼•è„š P14 */
+#define KEY2_IO                        0x2000 /* æŒ‰é”® 2 å¼•è„š P15 */
+#define KEY1_IO                        0x4000 /* æŒ‰é”® 1 å¼•è„š P16 */
+#define KEY0_IO                        0x8000 /* æŒ‰é”® 0 å¼•è„š P17 */
 
-#define KEY0                           xl9555_pin_read(KEY0_IO) /* ¶ÁÈ¡ KEY0 Òı½Å */
-#define KEY1                           xl9555_pin_read(KEY1_IO) /* ¶ÁÈ¡ KEY1 Òı½Å */
-#define KEY2                           xl9555_pin_read(KEY2_IO) /* ¶ÁÈ¡ KEY2 Òı½Å */
-#define KEY3                           xl9555_pin_read(KEY3_IO) /* ¶ÁÈ¡ KEY3 Òı½Å */
+#define KEY0                           xl9555_pin_read(KEY0_IO) /* è¯»å– KEY0 å¼•è„š */
+#define KEY1                           xl9555_pin_read(KEY1_IO) /* è¯»å– KEY1 å¼•è„š */
+#define KEY2                           xl9555_pin_read(KEY2_IO) /* è¯»å– KEY2 å¼•è„š */
+#define KEY3                           xl9555_pin_read(KEY3_IO) /* è¯»å– KEY3 å¼•è„š */
 
-#define KEY0_PRES                      1 /* KEY0 °´ÏÂ */
-#define KEY1_PRES                      2 /* KEY1 °´ÏÂ */
-#define KEY2_PRES                      3 /* KEY1 °´ÏÂ */
-#define KEY3_PRES                      4 /* KEY1 °´ÏÂ */
+#define KEY0_PRES                      1 /* KEY0 æŒ‰ä¸‹ */
+#define KEY1_PRES                      2 /* KEY1 æŒ‰ä¸‹ */
+#define KEY2_PRES                      3 /* KEY1 æŒ‰ä¸‹ */
+#define KEY3_PRES                      4 /* KEY1 æŒ‰ä¸‹ */
 
-void xl9555_init(i2c_obj_t self);                                   /* ³õÊ¼»¯XL9555 */
-int xl9555_pin_read(uint16_t pin);                                  /* »ñÈ¡Ä³¸öIO×´Ì¬ */
-uint16_t xl9555_pin_write(uint16_t pin, int val);                   /* ¿ØÖÆÄ³¸öIOµÄµçÆ½ */
-esp_err_t xl9555_read_byte(uint8_t* data, size_t len);              /* ¶ÁÈ¡XL9555µÄ16Î»IOÖµ */
-uint8_t xl9555_key_scan(uint8_t mode);                              /* É¨Ãè°´¼üÖµ */
-uint16_t xl9555_ioconfig(uint16_t config_value);                    /* ÅäÖÃXL9555µÄIO */
+void xl9555_init(i2c_obj_t self);                                   /* åˆå§‹åŒ–XL9555 */
+int xl9555_pin_read(uint16_t pin);                                  /* è·å–æŸä¸ªIOçŠ¶æ€ */
+uint16_t xl9555_pin_write(uint16_t pin, int val);                   /* æ§åˆ¶æŸä¸ªIOçš„ç”µå¹³ */
+esp_err_t xl9555_read_byte(uint8_t* data, size_t len);              /* è¯»å–XL9555çš„16ä½IOå€¼ */
+uint8_t xl9555_key_scan(uint8_t mode);                              /* æ‰«ææŒ‰é”®å€¼ */
+uint16_t xl9555_ioconfig(uint16_t config_value);                    /* é…ç½®XL9555çš„IO */
 
 #endif

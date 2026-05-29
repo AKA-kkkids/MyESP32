@@ -8,7 +8,7 @@ void xl9555_init(i2c_obj_t self)
     uint8_t r_data[2];
     if (self.init_flag == ESP_FAIL)
     {
-        iic_init(I2C_NUM_0); /* ³õÊ¼»¯ IIC */
+        iic_init(I2C_NUM_0); /* åˆå§‹åŒ– IIC */
     }
     xl9555_i2c_master = self;
     gpio_config_t gpio_init_struct = {0};
@@ -18,8 +18,8 @@ void xl9555_init(i2c_obj_t self)
     gpio_init_struct.pin_bit_mask = (1ull << XL9555_INT_IO);
     gpio_init_struct.pull_down_en = GPIO_PULLDOWN_DISABLE;
     gpio_init_struct.pull_up_en = GPIO_PULLUP_ENABLE;
-    gpio_config(&gpio_init_struct); /* ÅäÖÃ XL_INT Òı½Å */
-    /* ÉÏµçÏÈ¶ÁÈ¡Ò»´ÎÇå³ıÖĞ¶Ï±êÖ¾ */
+    gpio_config(&gpio_init_struct); /* é…ç½® XL_INT å¼•è„š */
+    /* ä¸Šç”µå…ˆè¯»å–ä¸€æ¬¡æ¸…é™¤ä¸­æ–­æ ‡å¿— */
     xl9555_read_byte(r_data, 2);
     
     xl9555_ioconfig(0xF003);
@@ -28,11 +28,11 @@ void xl9555_init(i2c_obj_t self)
 }
 
 /**
-* @brief Ïò XL9555 Ğ´Èë 16 Î» IO Öµ
-* @param reg£º¼Ä´æÆ÷µØÖ·
-* @param data£ºÒªĞ´ÈëµÄÊı¾İ
-* @param len£ºÒªĞ´ÈëÊı¾İµÄ´óĞ¡
-* @retval ESP_OK£º¶ÁÈ¡³É¹¦£»ÆäËû£º¶ÁÈ¡Ê§°Ü
+* @brief å‘ XL9555 å†™å…¥ 16 ä½ IO å€¼
+* @param regï¼šå¯„å­˜å™¨åœ°å€
+* @param dataï¼šè¦å†™å…¥çš„æ•°æ®
+* @param lenï¼šè¦å†™å…¥æ•°æ®çš„å¤§å°
+* @retval ESP_OKï¼šè¯»å–æˆåŠŸï¼›å…¶ä»–ï¼šè¯»å–å¤±è´¥
 */
 esp_err_t xl9555_write_byte(uint8_t reg, uint8_t *data, size_t len)
 {
@@ -48,10 +48,10 @@ esp_err_t xl9555_write_byte(uint8_t reg, uint8_t *data, size_t len)
 }
 
 /**
-* @brief ¶ÁÈ¡ XL9555 µÄ 16 Î» IO Öµ
-* @param data£º¶ÁÈ¡Êı¾İµÄ´æ´¢Çø
-* @param len£º¶ÁÈ¡Êı¾İµÄ´óĞ¡
-* @retval ESP_OK£º¶ÁÈ¡³É¹¦£»ÆäËû£º¶ÁÈ¡Ê§°Ü
+* @brief è¯»å– XL9555 çš„ 16 ä½ IO å€¼
+* @param dataï¼šè¯»å–æ•°æ®çš„å­˜å‚¨åŒº
+* @param lenï¼šè¯»å–æ•°æ®çš„å¤§å°
+* @retval ESP_OKï¼šè¯»å–æˆåŠŸï¼›å…¶ä»–ï¼šè¯»å–å¤±è´¥
 */
 esp_err_t xl9555_read_byte(uint8_t *data, size_t len)
 {
@@ -69,9 +69,9 @@ esp_err_t xl9555_read_byte(uint8_t *data, size_t len)
 }
 
 /**
-* @brief »ñÈ¡Ä³¸ö IO ×´Ì¬
-* @param pin : Òª»ñÈ¡×´Ì¬µÄ IO
-* @retval ´Ë IO ¿ÚµÄÖµ(×´Ì¬, 0/1)
+* @brief è·å–æŸä¸ª IO çŠ¶æ€
+* @param pin : è¦è·å–çŠ¶æ€çš„ IO
+* @retval æ­¤ IO å£çš„å€¼(çŠ¶æ€, 0/1)
 */
 int xl9555_pin_read(uint16_t pin)
 {
@@ -83,10 +83,10 @@ int xl9555_pin_read(uint16_t pin)
 }
 
 /**
- * @brief       ¿ØÖÆÄ³¸öIOµÄµçÆ½
- * @param       pin     : ¿ØÖÆµÄIO
- * @param       val     : µçÆ½
- * @retval      ·µ»ØËùÓĞIO×´Ì¬
+ * @brief       æ§åˆ¶æŸä¸ªIOçš„ç”µå¹³
+ * @param       pin     : æ§åˆ¶çš„IO
+ * @param       val     : ç”µå¹³
+ * @retval      è¿”å›æ‰€æœ‰IOçŠ¶æ€
  */
 uint16_t xl9555_pin_write(uint16_t pin, int val)
 {
@@ -126,14 +126,14 @@ uint16_t xl9555_pin_write(uint16_t pin, int val)
 }
 
 /**
-* @brief XL9555 µÄ IO ÅäÖÃ
-* @param config_value£ºIO ÅäÖÃÊäÈë»òÕßÊä³ö
-* @retval ·µ»ØÉèÖÃµÄÊıÖµ
+* @brief XL9555 çš„ IO é…ç½®
+* @param config_valueï¼šIO é…ç½®è¾“å…¥æˆ–è€…è¾“å‡º
+* @retval è¿”å›è®¾ç½®çš„æ•°å€¼
 */
 uint16_t xl9555_ioconfig(uint16_t config_value)
 {
- /* ´Ó»úµØÖ· + CMD + data1(P0) + data2(P1) */
-/* P00¡¢P01¡¢P14¡¢P15¡¢P16¡¢P17 ÎªÊäÈë£¬ÆäËûÒı½ÅÎªÊä³ö -->1111 0000 0000 0011 ×¢Òâ£º0 ÎªÊä³ö£¬1 ÎªÊäÈë*/
+ /* ä»æœºåœ°å€ + CMD + data1(P0) + data2(P1) */
+/* P00ã€P01ã€P14ã€P15ã€P16ã€P17 ä¸ºè¾“å…¥ï¼Œå…¶ä»–å¼•è„šä¸ºè¾“å‡º -->1111 0000 0000 0011 æ³¨æ„ï¼š0 ä¸ºè¾“å‡ºï¼Œ1 ä¸ºè¾“å…¥*/
     uint8_t data[2];
     esp_err_t err;
     int retry = 3;
@@ -169,27 +169,27 @@ uint16_t xl9555_ioconfig(uint16_t config_value)
 }
 
 /**
- * @brief       °´¼üÉ¨Ãèº¯Êı
- * @param       mode:0->²»Á¬Ğø;1->Á¬Ğø
- * @retval      ¼üÖµ, ¶¨ÒåÈçÏÂ:
- *              KEY0_PRES, 1, KEY0°´ÏÂ
- *              KEY1_PRES, 2, KEY1°´ÏÂ
- *              KEY2_PRES, 3, KEY2°´ÏÂ
- *              KEY3_PRES, 4, KEY3°´ÏÂ
+ * @brief       æŒ‰é”®æ‰«æå‡½æ•°
+ * @param       mode:0->ä¸è¿ç»­;1->è¿ç»­
+ * @retval      é”®å€¼, å®šä¹‰å¦‚ä¸‹:
+ *              KEY0_PRES, 1, KEY0æŒ‰ä¸‹
+ *              KEY1_PRES, 2, KEY1æŒ‰ä¸‹
+ *              KEY2_PRES, 3, KEY2æŒ‰ä¸‹
+ *              KEY3_PRES, 4, KEY3æŒ‰ä¸‹
  */
 uint8_t xl9555_key_scan(uint8_t mode)
 {
     uint8_t keyval = 0;
-    static uint8_t key_up = 1;                                          /* °´¼ü°´ËÉ¿ª±êÖ¾ */
+    static uint8_t key_up = 1;                                          /* æŒ‰é”®æŒ‰æ¾å¼€æ ‡å¿— */
 
     if (mode)
     {
-        key_up = 1;                                                     /* Ö§³ÖÁ¬°´ */
+        key_up = 1;                                                     /* æ”¯æŒè¿æŒ‰ */
     }
     
-    if (key_up && (KEY0 == 0 || KEY1 == 0 || KEY2 == 0  || KEY3 == 0 )) /* °´¼üËÉ¿ª±êÖ¾Îª1, ÇÒÓĞÈÎÒâÒ»¸ö°´¼ü°´ÏÂÁË */
+    if (key_up && (KEY0 == 0 || KEY1 == 0 || KEY2 == 0  || KEY3 == 0 )) /* æŒ‰é”®æ¾å¼€æ ‡å¿—ä¸º1, ä¸”æœ‰ä»»æ„ä¸€ä¸ªæŒ‰é”®æŒ‰ä¸‹äº† */
     {
-        vTaskDelay(10);                                                 /* È¥¶¶¶¯ */
+        vTaskDelay(10);                                                 /* å»æŠ–åŠ¨ */
         key_up = 0;
 
         if (KEY0 == 0)
@@ -212,10 +212,10 @@ uint8_t xl9555_key_scan(uint8_t mode)
             keyval = KEY3_PRES;
         }
     }
-    else if (KEY0 == 1 && KEY1 == 1 && KEY2 == 1 && KEY3 == 1)          /* Ã»ÓĞÈÎºÎ°´¼ü°´ÏÂ, ±ê¼Ç°´¼üËÉ¿ª */
+    else if (KEY0 == 1 && KEY1 == 1 && KEY2 == 1 && KEY3 == 1)          /* æ²¡æœ‰ä»»ä½•æŒ‰é”®æŒ‰ä¸‹, æ ‡è®°æŒ‰é”®æ¾å¼€ */
     {
         key_up = 1;
     }
 
-    return keyval;                                                      /* ·µ»Ø¼üÖµ */
+    return keyval;                                                      /* è¿”å›é”®å€¼ */
 }

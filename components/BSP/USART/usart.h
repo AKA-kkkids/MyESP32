@@ -9,15 +9,15 @@
 #include "driver/gpio.h"
 
 
-/* Òý½ÅºÍ´®¿Ú¶¨Òå */
+/* ï¿½ï¿½ï¿½ÅºÍ´ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ */
 #define USART_UX            UART_NUM_0
 #define USART_TX_GPIO_PIN   GPIO_NUM_43
 #define USART_RX_GPIO_PIN   GPIO_NUM_44
 
-/* ´®¿Ú½ÓÊÕÏà¹Ø¶¨Òå */
-#define RX_BUF_SIZE         1024    /* »·ÐÎ»º³åÇø´óÐ¡ */
+/* ï¿½ï¿½ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ */
+#define RX_BUF_SIZE         1024    /* ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ */
 
-/* º¯ÊýÉùÃ÷ */
-void usart_init(uint32_t baudrate); /* ³õÊ¼»¯´®¿Ú */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+void usart_init(uint32_t baudrate); /* ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 
 #endif

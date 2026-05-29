@@ -1,0 +1,19 @@
+[sections:shellCommand]
+entries:
+    shellCommand+
+
+[sections:combox]
+entries:
+    .combox+
+
+[scheme:esp_default]
+entries:
+    shellCommand -> flash_rodata
+    combox ->flash_rodata
+
+[mapping:map]
+archive: *
+entries:
+    * (esp_default);
+    shellCommand -> flash_rodata KEEP() ALIGN(4, pre, post) SURROUND(shell_command),
+    combox -> flash_rodata KEEP() ALIGN(4, pre, post) SURROUND(shell_command)
